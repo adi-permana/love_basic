@@ -1,3 +1,4 @@
+-- create a new rectangle every 2 seconds
 function love.load()
   -- load the tick library
   tick = require "tick"
