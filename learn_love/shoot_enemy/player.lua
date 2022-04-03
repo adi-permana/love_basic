@@ -13,10 +13,10 @@ end
 
 function Player:update(dt)
   -- Player movement to the left or right
-  if love.keyboard.isDown("d") then
+  if love.keyboard.isDown("left") then
     self.x = self.x - self.speed * dt
     print(self.x)
-  elseif love.keyboard.isDown("a") then
+  elseif love.keyboard.isDown("right") then
     self.x = self.x + self.speed * dt
     print(self.x)
   end
@@ -39,3 +39,11 @@ function Player:draw()
   love.graphics.draw(self.image, self.x, self.y)
 end
 
+-- player shoots bullet
+function Player:keyPressed(key)
+  -- When spacebar is spressed
+  if key == "space" then
+    -- Put new instance of bullet into listOfBullets table
+    table.insert(listOfBullets, Bullet(self.x, self.y))
+  end
+end
