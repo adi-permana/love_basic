@@ -42,9 +42,9 @@ function love.update(dt)
 end
 
 function love.draw()
-  -- visualize the triangle of pythagoreas theory
-  love.graphics.circle("line", circle.x, circle.y, circle.radius)
-
+  love.graphics.circle("line", circle.x, circle.y, circle.
+  
+   -- visualize the triangle of pythagoreas theory
   love.graphics.line(circle.x, circle.y, mouse_x, mouse_y)
   love.graphics.line(circle.x, circle.y, mouse_x, circle.y)
   love.graphics.line(mouse_x, mouse_y, mouse_x, circle.y)
