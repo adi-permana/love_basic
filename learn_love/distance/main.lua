@@ -30,15 +30,20 @@ function love.update(dt)
   -- Get mouse position
   mouse_x, mouse_y = love.mouse.getPosition()
 
+  -- Get cos and sin of circle's angle
   angle = math.atan2(mouse_y - circle.y, mouse_x - circle.x)
-
   cos = math.cos(angle)
   sin = math.sin(angle)
 
-  -- Move circle toward mouse
-  circle.x = circle.x + circle.speed * cos * dt
-  circle.y = circle.y + circle.speed * sin * dt
+  -- Get circle mouse distance
+  local distance = getDistance(mouse_x, mouse_y, circle.x, circle.y)
 
+  -- Move circle if mouse is within 400 pixel of circle
+  if distance < 100 then
+    -- Move circle toward mouse
+    circle.x = circle.x + circle.speed * cos * dt
+    circle.y = circle.y + circle.speed * sin * dt
+  end
 end
 
 function love.draw()
