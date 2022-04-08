@@ -34,7 +34,7 @@ function love.draw()
     end
   end
 
-  love.graphics.print("Vertical tile map with colored tiles", 5, 10)
+love.graphics.print("Vertical tile map with colored tiles", 5, 10)
   -- loop through the vertTilemap to create a vertical tile level
   -- Iterate through the rows of vertTilemap
   for i, row in ipairs(vertTilemap) do
