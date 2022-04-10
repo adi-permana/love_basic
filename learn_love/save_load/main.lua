@@ -1,4 +1,7 @@
 function love.load()
+  -- Load lume for reading saved data table; as when saved data table it will output pointer only
+  lume = require "lume"
+
   -- Create player obj
   player = {
     -- position
@@ -7,12 +10,31 @@ function love.load()
 
     size = 25,
 
+    -- Player's score
+    points = 0,
+
     -- Load player face
     image = love.graphics.newImage("img/face.png")
   }
 
   -- Coin table
   coins = {}
+
+  -- Read save data if available
+  if love.filesystem.getInfo("savedata.txt") then
+    file = love.filesystem.read("savedata.txt")
+    -- Print save data into console
+    print("Saved data: "..file)
+    -- Convert the save file into table readable by engine
+    data = lume.deserialize(file)
+
+    -- Apply the saved position, size and points of player
+    player.x = data.player.x
+    player.y = data.player.y
+    player.size = data.player.size
+    player.points = data.player.points
+    
+  end
 
   for i=1,25 do
     table.insert(coins, {
@@ -27,8 +49,6 @@ function love.load()
       image = love.graphics.newImage("img/dollar.png")
     })
   end
-
-  points = 0
 end
 
 -- Check collision for the ability to collect coin
@@ -60,11 +80,43 @@ function love.update(dt)
   for i=#coins,1,-1 do
     if checkCollision(player, coins[i]) then
       table.remove(coins, i)
-      points = points + 1
+      player.points = player.points + 1
       player.size = player.size + 1
     end
   end
 
+end
+
+-- In general don't save data more than you don't need as it could increase size
+function saveGame()
+  -- Saved data table
+  data = {}
+  
+  -- Saves player's data
+  data.player = {
+    x = player.x,
+    y = player.x,
+    size = player.size,
+    points = player.points
+  }
+
+  -- Save amount of coins left over
+  data.coins = {}
+  for i,v in ipairs(coins) do
+    -- Insert data/position of left over coins
+    data.coins[i] = {x = v.x, y = v.y}
+  end
+
+  serialized = lume.serialize(data)
+  print("To be saved: "..serialized)
+  -- Save the data to the love appdata folder as save file
+  love.filesystem.write("savedata.txt", serialized)
+end
+
+function love.keypressed(key)
+  if key == "f1" then
+    saveGame()
+  end
 end
 
 function love.draw()
@@ -82,5 +134,5 @@ function love.draw()
     love.graphics.draw(v.image, v.x, v.y, 0, 1, 1, v.image:getWidth()/2, v.image:getHeight()/2)
   end
 
-  love.graphics.print("Points: ".. points, 10, 10)
+  love.graphics.print("Points: ".. player.points, 10, 10)
 end
