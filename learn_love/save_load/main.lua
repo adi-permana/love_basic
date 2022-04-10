@@ -20,11 +20,11 @@ function love.load()
   -- Coin table
   coins = {}
 
-  -- Read save data if available
+  -- Read save data if available, and use load it
   if love.filesystem.getInfo("savedata.txt") then
     file = love.filesystem.read("savedata.txt")
     -- Print save data into console
-    print("Saved data: "..file)
+    print("DATA LOADED: "..file)
     -- Convert the save file into table readable by engine
     data = lume.deserialize(file)
 
@@ -34,20 +34,30 @@ function love.load()
     player.size = data.player.size
     player.points = data.player.points
     
-  end
-
-  for i=1,25 do
-    table.insert(coins, {
-      -- Give it a random position
-      -- love.math lib gives better random seed.
-      x = love.math.random(50, 650),
-      y = love.math.random(50, 450),
-
-      size = 10,
-      
-      -- Load coin image
-      image = love.graphics.newImage("img/dollar.png")
-    })
+    -- Apply saved position of coins and number of availability
+    for i,v in ipairs(data.coins) do
+      coins[i] = {
+        x = v.x,
+        y = v.y,
+        size = 10,
+        image = love.graphics.newImage("img/dollar.png")
+      }
+    end
+  -- If there is no save file
+  else
+    for i=1,25 do
+      table.insert(coins, {
+        -- Give it a random position
+        -- love.math lib gives better random seed.
+        x = love.math.random(50, 650),
+        y = love.math.random(50, 450),
+        
+        size = 10,
+        
+        -- Load coin image
+        image = love.graphics.newImage("img/dollar.png")
+      })
+    end
   end
 end
 
@@ -95,7 +105,7 @@ function saveGame()
   -- Saves player's data
   data.player = {
     x = player.x,
-    y = player.x,
+    y = player.y,
     size = player.size,
     points = player.points
   }
@@ -108,7 +118,7 @@ function saveGame()
   end
 
   serialized = lume.serialize(data)
-  print("To be saved: "..serialized)
+  print("DATA TO BE SAVE: "..serialized)
   -- Save the data to the love appdata folder as save file
   love.filesystem.write("savedata.txt", serialized)
 end
@@ -116,6 +126,12 @@ end
 function love.keypressed(key)
   if key == "f1" then
     saveGame()
+  -- Reset game to no save file and start over
+  elseif key == "f2" then
+    -- Delete save file
+    love.filesystem.remove("savedata.txt")
+      -- restart game
+      love.event.quit("restart")
   end
 end
 
@@ -134,5 +150,7 @@ function love.draw()
     love.graphics.draw(v.image, v.x, v.y, 0, 1, 1, v.image:getWidth()/2, v.image:getHeight()/2)
   end
 
-  love.graphics.print("Points: ".. player.points, 10, 10)
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.print("Coins Collected: ".. player.points, 10, 10, 0, 1.5, 1.5)
+  love.graphics.print("Press f1 to save. Press f2 to restart and delete save file.", 290, 570, 0, 1.5, 1.5)
 end
