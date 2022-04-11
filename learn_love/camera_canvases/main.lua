@@ -59,6 +59,12 @@ function love.load()
       })
     end
   end
+
+  -- Add camerashakes
+  shakeDuration = 0
+  -- Offset for dt so as to shake similarly in different screen refresh rate
+  shakeWait = 0
+  shakeOffset = {x = 0, y = 0}
 end
 
 -- Check collision for the ability to collect coin
@@ -92,9 +98,22 @@ function love.update(dt)
       table.remove(coins, i)
       player.points = player.points + 1
       player.size = player.size + 1
+      shakeDuration = 0.3
     end
   end
 
+  -- Camera shakes
+  if shakeDuration > 0 then
+    shakeDuration = shakeDuration - dt
+    -- Offset for delta time so shakes are the same on different screen
+    if shakeWait > 0 then
+      shakeWait = shakeWait - dt
+    else
+      shakeOffset.x = love.math.random(-5, 5)
+      shakeOffset.y = love.math.random(-5, 5)
+      shakeWait = 0.05
+    end
+  end
 end
 
 -- In general don't save data more than you don't need as it could increase size
@@ -140,10 +159,17 @@ function love.draw()
 
   -- Make copy of the state and push it to stack.
   love.graphics.push()
-  -- Makes player so its always in the center of the screen with the camera following its movement
+  -- Makes player so its always in the center of the screen with the camera following its movement, by using a coordinate system
   love.graphics.translate(-player.x + 400, -player.y + 300)
 
-    -- Draw player
+  -- Shakes the camera when collected a coin
+  if shakeDuration > 0 then
+    -- translate random number between -5 to 5
+    -- This translate will done base on the above love.graphics.translate, so as not to reset the above translate
+    love.graphics.translate(shakeOffset.x, shakeOffset.y)
+  end
+
+  -- Draw player
   love.graphics.setColor(love.math.colorFromBytes(255, 255, 0))
   love.graphics.circle("line", player.x, player.y, player.size)
   -- Add face to player
