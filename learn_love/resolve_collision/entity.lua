@@ -15,12 +15,18 @@ function Entity:new(x, y, image_path)
 
   -- Add strength; entity with lower strength get pushed away
   self.strength = 0
+
+  -- Add temporary strength
+  self.tempStrength = 0
 end
 
 function Entity:update()
   -- Set current position to the previous position
   self.last.x = self.x
   self.last.y = self.y
+
+  -- Give temporary strength same strength as self strength
+  self.tempStrength = self.strength
 end
 
 function Entity:draw()
@@ -55,14 +61,17 @@ end
 
 -- When collision detected resolve this
 function Entity:resolveCollison(e)
-  -- Check strength so doesnt matter if we call this function on the wall or player; The wall will stay put as it has higher strength
-  if self.strength > e.strength then
-    e:resolveCollison(self)
+  -- Compare tempStrength so entities will pushback in accordance to its strength; such as when player pushes box against wall, the wall should push the box back to the player
+  if self.tempStrength > e.tempStrength then
     -- Return so that it doesn't continue the function
-    return
+    -- Return the value so it will reach main.lua
+    return e:resolveCollison(self)
   end
 
   if self:checkCollision(e) then
+    -- Copy tempStrength; Example when player push box against wall, box should copy wall's strength temporarily to push player back
+    self.tempStrength = e.tempStrength
+
     -- Check player's vertical allignment with wall
     if self:wasVerticallyAligned(e) then
       -- check center of player with center of wall
@@ -92,5 +101,9 @@ function Entity:resolveCollison(e)
         self.y = self.y + pushback
       end
     end
+    -- After collision is resolved return true so it exits to main.lua
+    return true
   end
+  -- When there is no collision to resolve
+  return false
 end

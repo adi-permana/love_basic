@@ -3,6 +3,9 @@ Player = Entity:extend()
 
 function Player:new(x, y)
   Player.super.new(self, x, y, "img/player.png")
+
+  -- Make player stronger than the box
+  self.strength = 10
 end
 
 function Player:update(dt)
