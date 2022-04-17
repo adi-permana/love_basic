@@ -47,6 +47,14 @@ function love.load()
   end
 end
 
+-- Jumping ability
+function love.keypressed(key)
+  -- When pressed "up" player jump
+  if key == "up" then
+    player:jump()
+  end
+end
+
 function love.update(dt)
   -- Update the objects entities
   for i,v in ipairs(objects) do
