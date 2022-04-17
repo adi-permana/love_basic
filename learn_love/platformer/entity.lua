@@ -86,31 +86,17 @@ function Entity:resolveCollision(e)
     if self:wasVerticallyAligned(e) then
       -- check center of player with center of wall
       if self.x + self.width/2 < e.x + e.width/2 then
-        -- right side of PLAYER [self.x + self,width] - [e.x] left side of WALL
-        local pushback = self.x + self.width - e.x
-        -- alligned with left side of wall; push player left
-        self.x = self.x - pushback
+        self:collide(e, "right")
       else 
-        -- right side of WALL [e.x + e.width] - [self.x] left side of PLAYER 
-        local pushback = e.x + e.width - self.x
-        -- Alligned with right side of wall; push player right
-        self.x = self.x + pushback
+        self:collide(e, "left")
       end
     -- Check player's horizontal allignment with wall
     elseif self:wasHorizontallyAlligned(e) then
       -- Check center of player with center wall
       if self.y + self.height/2 < e.y + e.height/2 then
-        -- bottom side of PLAYER [self.y + self.height] - [e.y] top side of WALL
-        local pushback = self.y + self.height - e.y
-        -- alligned with top side of wall; push player up
-        self.y = self.y - pushback
-        -- So that gravity will not continually increasing we need to reset gravity when entities hit bottom/collision with the bottom
-        self.gravity = 0
+        self:collide(e, "bottom")
       else
-        -- Bottom side of WALL [e.y + e.height] - [self.y] top side of PLAYER
-        local pushback = e.y + e.height - self.y
-        -- alligned with bottom side of wall; push player down
-        self.y = self.y + pushback
+        self:collide(e, "top")
       end
     end
     -- After collision is resolved return true so it exits to main.lua
@@ -118,4 +104,31 @@ function Entity:resolveCollision(e)
   end
   -- When there is no collision to resolve
   return false
+end
+
+-- When entity collides
+function Entity:collide(e, direction)
+  if direction == "right" then
+    -- right side of PLAYER [self.x + self,width] - [e.x] left side of WALL
+    local pushback = self.x + self.width - e.x
+    -- alligned with left side of wall; push player left
+    self.x = self.x - pushback
+  elseif direction == "left" then
+    -- right side of WALL [e.x + e.width] - [self.x] left side of PLAYER 
+    local pushback = e.x + e.width - self.x
+    -- Alligned with right side of wall; push player right
+    self.x = self.x + pushback
+  elseif direction == "bottom" then
+    -- bottom side of PLAYER [self.y + self.height] - [e.y] top side of WALL
+    local pushback = self.y + self.height - e.y
+    -- alligned with top side of wall; push player up
+    self.y = self.y - pushback
+    -- So that gravity will not continually increasing we need to reset gravity when entities hit bottom/collision with the bottom
+    self.gravity = 0
+  elseif direction == "top" then
+    -- Bottom side of WALL [e.y + e.height] - [self.y] top side of PLAYER
+    local pushback = e.y + e.height - self.y
+    -- alligned with bottom side of wall; push player down
+    self.y = self.y + pushback
+  end
 end

@@ -6,6 +6,9 @@ function Player:new(x, y)
 
   -- Make player stronger than the box
   self.strength = 10
+
+  -- Make it so player can only jump when it hits the ground
+  self.canJump = false
 end
 
 function Player:update(dt)
@@ -20,8 +23,25 @@ function Player:update(dt)
     self.x = self.x + 200 * dt
   end
 
-  -- Move up and down
-  if love.keyboard.isDown("up") then
-    self.y = self.y - 200 * dt
+  -- Check if the previous y-pos is not equal to current y-pos, as when standing on the ground should not move vertically, and if so it means you're not standing on the ground
+  if self.last.y ~= self.y then
+    -- So it can't move vertically/jump when in air
+    self.canJump = false
+  end
+end
+
+function Player:jump()
+  if self.canJump then
+    -- Lessen the gravity so player jump, the lower the gravity value the higher the player jump
+    self.gravity = -300
+    self.canJump = false
+  end
+end
+
+-- Override collide(e) so we can set canJump to false when hit bottom
+function Player:collide(e, direction)
+  Player.super.collide(self, e, direction)
+  if direction == "bottom" then
+    self.canJump = true
   end
 end
