@@ -86,17 +86,46 @@ function Entity:resolveCollision(e)
     if self:wasVerticallyAligned(e) then
       -- check center of player with center of wall
       if self.x + self.width/2 < e.x + e.width/2 then
-        self:collide(e, "right")
+        -- self:collide(e, "right")
+
+        -- ! Go through platform, but able to stand
+        -- Check if both entity true then resolve collision
+        local a = self:checkResolve(e, "right")
+        local b = e:checkResolve(self, "left")
+        if a and b then 
+          self:collide(e, "right")
+        end
       else 
-        self:collide(e, "left")
+        -- self:collide(e, "left")
+        
+        -- ! Go through platform
+        local a = self:checkResolve(e, "left")
+        local b = e:checkResolve(self, "right")
+        if a and b then
+          self:collide(e, "left")
+        end
       end
     -- Check player's horizontal allignment with wall
     elseif self:wasHorizontallyAlligned(e) then
       -- Check center of player with center wall
       if self.y + self.height/2 < e.y + e.height/2 then
-        self:collide(e, "bottom")
+        -- self:collide(e, "bottom")
+
+        -- ! Go through platform
+        local a = self:checkResolve(e, "bottom")
+        local b = e:checkResolve(self, "top")
+        if a and b then
+          self:collide(e, "bottom")
+        end
       else
-        self:collide(e, "top")
+        -- self:collide(e, "top")
+
+        -- ! Go through platform
+        local a = self:checkResolve(e, "bottom")
+        local b = e:checkResolve(self, "top")
+        if a and b then
+          self:collide(e, "top")
+        end
       end
     end
     -- After collision is resolved return true so it exits to main.lua
@@ -104,6 +133,12 @@ function Entity:resolveCollision(e)
   end
   -- When there is no collision to resolve
   return false
+end
+
+-- ! Jump through platform
+-- Check if both entities of the collision want the collision to be resolved.
+function Entity:checkResolve(e, direction)
+  return true
 end
 
 -- When entity collides

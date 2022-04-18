@@ -45,3 +45,21 @@ function Player:collide(e, direction)
     self.canJump = true
   end
 end
+
+-- Overide entity's checkResolve
+function Player:checkResolve(e, direction)
+  -- Check if e is type box; NOTE also works with base classes in that both [e:is(Box)] and [e:is(Entity)] would return [true]; 
+  -- ! Also capitalized the class name
+  if e:is(Box) then
+    -- check if the direction is bottom i.e. collision between bottom of player and top of box
+    if direction == "bottom"  then
+      return true
+    else
+      -- ! Means player can walk through box
+      return false
+    end
+  end
+  -- Collision with any other entity resolved the collision
+  return true
+end
+
